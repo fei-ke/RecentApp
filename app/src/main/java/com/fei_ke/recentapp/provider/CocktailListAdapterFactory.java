@@ -71,7 +71,7 @@ public class CocktailListAdapterFactory implements RemoteViewsFactory {
 
         String packageName = recentTask.baseIntent.getComponent().getPackageName();
         Bitmap icon = iconCache.get(packageName);
-        String title = "";
+        String title;
         if (recentTask.origActivity != null) {
             recentTask.baseIntent.setComponent(recentTask.origActivity);
         }
