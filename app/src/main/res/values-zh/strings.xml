@@ -3,5 +3,6 @@
     <string name="app_name">最近应用</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">设置</string>
+    <string name="show_app_count">显示应用个数</string>
 
 </resources>

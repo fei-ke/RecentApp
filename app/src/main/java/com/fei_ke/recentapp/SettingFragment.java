@@ -26,8 +26,8 @@ public class SettingFragment extends PreferenceFragment {
         ep.setSummary(settings.getAppCount() + "");
         ep.setKey(Settings.KEY_APP_COUNT);
         ep.setDefaultValue("15");
-        ep.setTitle("显示应用个数");
-        ep.setDialogTitle("显示应用个数");
+        ep.setTitle(R.string.show_app_count);
+        ep.setDialogTitle(R.string.show_app_count);
         ep.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
