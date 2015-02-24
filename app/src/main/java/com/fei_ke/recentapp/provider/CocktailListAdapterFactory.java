@@ -77,6 +77,8 @@ public class CocktailListAdapterFactory implements RemoteViewsFactory {
         }
 
         final ResolveInfo resolveInfo = mPackageManager.resolveActivity(recentTask.baseIntent, 0);
+        if (resolveInfo == null) return null;
+
         final ActivityInfo info = resolveInfo.activityInfo;
         title = info.loadLabel(mPackageManager).toString();
 
