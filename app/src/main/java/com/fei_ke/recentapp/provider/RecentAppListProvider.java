@@ -17,7 +17,7 @@ import com.samsung.android.sdk.look.cocktailbar.SlookCocktailProvider;
  */
 public class RecentAppListProvider extends SlookCocktailProvider {
 
-    private static final String TAG = "CocktailListAdapterProvider";
+    private static final String TAG = "RecentAppListProvider";
 
     @Override
     public void onUpdate(Context context, SlookCocktailManager cocktailManager, int[] cocktailIds) {

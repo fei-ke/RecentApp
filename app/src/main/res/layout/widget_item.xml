@@ -10,11 +10,22 @@
     android:paddingBottom="10dp"
     android:paddingTop="10dp">
 
-    <ImageView
+    <FrameLayout
         android:layout_margin="5dp"
-        android:id="@+id/imageViewIcon"
         android:layout_width="30dp"
-        android:layout_height="30dp"/>
+        android:layout_height="30dp">
+
+        <ImageView
+            android:id="@+id/imageViewIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/widget_selector"/>
+
+    </FrameLayout>
 
     <TextView
         android:gravity="center"
