@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 public class Settings {
     public static final String KEY_APP_COUNT = "app_count";
     private SharedPreferences mSharedPreferences;
+    public static boolean switchOn;
 
     public Settings(Context context) {
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -18,5 +19,13 @@ public class Settings {
     public int getAppCount() {
         String count = mSharedPreferences.getString(KEY_APP_COUNT, "15");
         return Integer.valueOf(count);
+    }
+
+    public static boolean isSwitchOn() {
+        return switchOn;
+    }
+
+    public static void setSwitchOn(boolean switchOn) {
+        Settings.switchOn = switchOn;
     }
 }

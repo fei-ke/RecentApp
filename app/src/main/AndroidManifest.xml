@@ -5,6 +5,7 @@
     <uses-permission
         android:name="com.samsung.android.providers.context.permission.WRITE_USE_APP_FEATURE_SURVEY"/>
     <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES"/>
 
     <application
         android:allowBackup="true"
@@ -25,6 +26,9 @@
             android:enabled="true">
             <intent-filter>
                 <action android:name="com.samsung.android.cocktail.action.COCKTAIL_UPDATE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SWITCH_CLICK"/>
             </intent-filter>
 
             <meta-data

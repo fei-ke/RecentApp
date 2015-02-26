@@ -1,5 +1,6 @@
 package com.fei_ke.recentapp.provider;
 
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,7 +30,7 @@ public class RecentAppListProvider extends SlookCocktailProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
 
         views.setRemoteAdapter(R.id.widgetlist, intent);
-//        views.setEmptyView(R.id.widgetlist, R.id.emptylist);
+        //views.setEmptyView(R.id.widgetlist, R.id.emptylist);
 
         Intent itemClickIntent = new Intent(context, RecentAppListProvider.class);
         itemClickIntent.setAction(Constants.COCKTAIL_LIST_ADAPTER_CLICK_ACTION);
@@ -37,6 +38,10 @@ public class RecentAppListProvider extends SlookCocktailProvider {
         PendingIntent itemClickPendingIntent = PendingIntent.getBroadcast(context, 1,
                 itemClickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.widgetlist, itemClickPendingIntent);
+
+        Intent switchIntent = new Intent(Constants.COCKTAIL_LIST_ADAPTER_SWITCH_CLICK);
+        PendingIntent switchPendingIntent = PendingIntent.getBroadcast(context, 1, switchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.imageSwitch, switchPendingIntent);
 
         for (int i = 0; i < cocktailIds.length; i++) {
             cocktailManager.updateCocktail(cocktailIds[i], views);
@@ -46,17 +51,27 @@ public class RecentAppListProvider extends SlookCocktailProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        if (intent.getAction() == Constants.COCKTAIL_LIST_ADAPTER_CLICK_ACTION) {
+        String action = intent.getAction();
+        if (action == Constants.COCKTAIL_LIST_ADAPTER_CLICK_ACTION) {
             PendingIntent p = intent.getParcelableExtra(Constants.EXTRA_CONTENT_INTENT);
             if (p != null) {
-                try {
-                    p.send();
-                } catch (PendingIntent.CanceledException e) {
+                try { p.send(); } catch (PendingIntent.CanceledException e) {
                     e.printStackTrace();
                 }
+            } else {
+                String packageName=intent.getStringExtra(Constants.EXTRA_PACKAGE_NAME);
+                closeApp(context, packageName);
             }
+        } else if (action == Constants.COCKTAIL_LIST_ADAPTER_SWITCH_CLICK) {
+            Settings.setSwitchOn(!Settings.isSwitchOn());
+            notifyDateSetChange(context);
         }
 
+    }
+
+    private void closeApp(Context context, String packageName) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        am.killBackgroundProcesses(packageName);
     }
 
     @Override
@@ -70,12 +85,18 @@ public class RecentAppListProvider extends SlookCocktailProvider {
         super.onVisibilityChanged(context, cocktailId, visibility);
         Log.d(TAG, "onVisibilityChanged");
         if (visibility == SlookCocktailManager.COCKTAIL_VISIBILITY_SHOW) {
-            SlookCocktailManager mgr = SlookCocktailManager.getInstance(context);
-            int[] cocktailIds = mgr.getCocktailIds(new ComponentName(context,
-                    RecentAppListProvider.class));
-            for (int i = 0; i < cocktailIds.length; i++) {
-                mgr.notifyCocktailViewDataChanged(cocktailIds[i], R.id.widgetlist);
-            }
+            notifyDateSetChange(context);
+        } else {
+            Settings.setSwitchOn(false);
+        }
+    }
+
+    private void notifyDateSetChange(Context context) {
+        SlookCocktailManager mgr = SlookCocktailManager.getInstance(context);
+        int[] cocktailIds = mgr.getCocktailIds(new ComponentName(context,
+                RecentAppListProvider.class));
+        for (int i = 0; i < cocktailIds.length; i++) {
+            mgr.notifyCocktailViewDataChanged(cocktailIds[i], R.id.widgetlist);
         }
     }
 }

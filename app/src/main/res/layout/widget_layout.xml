@@ -8,6 +8,13 @@
     android:paddingBottom="20dp"
     android:paddingTop="20dp">
 
+    <ImageView
+        android:id="@+id/imageSwitch"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_close"/>
+
     <ListView
         android:id="@+id/widgetlist"
         android:layout_width="match_parent"

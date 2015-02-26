@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
@@ -60,23 +61,29 @@ public class CocktailListAdapterFactory implements RemoteViewsFactory {
     public RemoteViews getViewAt(int position) {
         ActivityManager.RecentTaskInfo recentTask = mAppList.get(getCount() - position - 1);
         RemoteViews contentView = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
+        contentView.setViewVisibility(R.id.imageViewClose, Settings.isSwitchOn() ? View.VISIBLE : View.GONE);
+
+        Intent baseIntent = recentTask.baseIntent;
+        String packageName = baseIntent.getComponent().getPackageName();
+
         Bundle extras = new Bundle();
         Intent fillInIntent = new Intent();
-
-        Intent LaunchIntent = recentTask.baseIntent;
-        PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, LaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        extras.putParcelable(Constants.EXTRA_CONTENT_INTENT, pIntent);
+        if (Settings.isSwitchOn()) {
+            extras.putString(Constants.EXTRA_PACKAGE_NAME, packageName);
+        } else {
+            PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, baseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            if (recentTask.origActivity != null) {
+                baseIntent.setComponent(recentTask.origActivity);
+            }
+            extras.putParcelable(Constants.EXTRA_CONTENT_INTENT, pIntent);
+        }
         fillInIntent.putExtras(extras);
         contentView.setOnClickFillInIntent(R.id.widget_item_layout, fillInIntent);
 
-        String packageName = recentTask.baseIntent.getComponent().getPackageName();
         Bitmap icon = iconCache.get(packageName);
         String title;
-        if (recentTask.origActivity != null) {
-            recentTask.baseIntent.setComponent(recentTask.origActivity);
-        }
 
-        final ResolveInfo resolveInfo = mPackageManager.resolveActivity(recentTask.baseIntent, 0);
+        final ResolveInfo resolveInfo = mPackageManager.resolveActivity(baseIntent, 0);
         if (resolveInfo == null) return null;
 
         final ActivityInfo info = resolveInfo.activityInfo;

@@ -9,13 +9,35 @@
     android:descendantFocusability="blocksDescendants"
     android:orientation="vertical"
     android:paddingLeft="10dp"
-    android:paddingRight="10dp">
+    android:paddingRight="10dp"
+    android:clipChildren="false">
 
-    <ImageView
-        android:id="@+id/imageViewIcon"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        tools:src="@drawable/ic_launcher"/>
+    <FrameLayout
+        android:clipChildren="false"
+        android:layout_margin="5dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp">
+
+        <ImageView
+            android:id="@+id/imageViewIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"/>
+
+        <ImageView
+            android:layout_marginTop="-2dp"
+            android:layout_marginRight="-2dp"
+            android:id="@+id/imageViewClose"
+            android:layout_gravity="right|top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_close"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/widget_selector"/>
+
+    </FrameLayout>
 
     <TextView
         android:gravity="center"
@@ -24,5 +46,6 @@
         android:layout_height="wrap_content"
         android:text="描述"
         android:textColor="@android:color/white"
-        android:textSize="9sp"/>
+        android:textSize="9sp"
+        tools:textColor="@android:color/bl"/>
 </LinearLayout>

@@ -4,9 +4,16 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:paddingLeft="10dp"
     android:paddingRight="10dp">
+
+    <ImageView
+        android:id="@+id/imageSwitch"
+        android:padding="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_close"/>
 
     <HorizontalListView
         android:id="@+id/widgetlist"
