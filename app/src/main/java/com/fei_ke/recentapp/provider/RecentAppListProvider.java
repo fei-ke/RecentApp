@@ -63,10 +63,18 @@ public class RecentAppListProvider extends SlookCocktailProvider {
             if (Settings.isSwitchOn()) {
                 closeApp(context, persistentId);
             } else {
+                System.out.println(recentTaskInfo.baseIntent);
                 if (recentTaskInfo.id != -1) {
                     getActivityManager(context).moveTaskToFront(persistentId, 0);
                 } else {
-                    context.startActivity(recentTaskInfo.baseIntent);
+                    if (recentTaskInfo.origActivity != null) {
+                        recentTaskInfo.baseIntent.setComponent(recentTaskInfo.origActivity);
+                    }
+                    try {
+                        context.startActivity(recentTaskInfo.baseIntent);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
                 }
             }
 
