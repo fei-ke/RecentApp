@@ -13,12 +13,16 @@ import com.fei_ke.recentapp.R;
 import com.samsung.android.sdk.look.cocktailbar.SlookCocktailManager;
 import com.samsung.android.sdk.look.cocktailbar.SlookCocktailProvider;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Created by 杨金阳 on 15/2/2015.
  */
 public class RecentAppListProvider extends SlookCocktailProvider {
 
     private static final String TAG = "RecentAppListProvider";
+    private ActivityManager mActivityManager;
 
     @Override
     public void onUpdate(Context context, SlookCocktailManager cocktailManager, int[] cocktailIds) {
@@ -53,15 +57,19 @@ public class RecentAppListProvider extends SlookCocktailProvider {
         super.onReceive(context, intent);
         String action = intent.getAction();
         if (action == Constants.COCKTAIL_LIST_ADAPTER_CLICK_ACTION) {
-            PendingIntent p = intent.getParcelableExtra(Constants.EXTRA_CONTENT_INTENT);
-            if (p != null) {
-                try { p.send(); } catch (PendingIntent.CanceledException e) {
-                    e.printStackTrace();
-                }
+            ActivityManager.RecentTaskInfo recentTaskInfo = intent.getParcelableExtra(Constants.EXTRA_RECENT_TASK);
+
+            int persistentId = recentTaskInfo.persistentId;
+            if (Settings.isSwitchOn()) {
+                closeApp(context, persistentId);
             } else {
-                String packageName=intent.getStringExtra(Constants.EXTRA_PACKAGE_NAME);
-                closeApp(context, packageName);
+                if (recentTaskInfo.id != -1) {
+                    getActivityManager(context).moveTaskToFront(persistentId, 0);
+                } else {
+                    context.startActivity(recentTaskInfo.baseIntent);
+                }
             }
+
         } else if (action == Constants.COCKTAIL_LIST_ADAPTER_SWITCH_CLICK) {
             Settings.setSwitchOn(!Settings.isSwitchOn());
             notifyDateSetChange(context);
@@ -69,9 +77,26 @@ public class RecentAppListProvider extends SlookCocktailProvider {
 
     }
 
-    private void closeApp(Context context, String packageName) {
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        am.killBackgroundProcesses(packageName);
+    private ActivityManager getActivityManager(Context context) {
+        if (mActivityManager == null) {
+            mActivityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        }
+        return mActivityManager;
+    }
+
+    private void closeApp(Context context, int persistentId) {
+        ActivityManager am = getActivityManager(context);
+        try {
+            Method method = ActivityManager.class.getMethod("removeTask", int.class, int.class);
+            method.setAccessible(true);
+            method.invoke(am, persistentId, 1);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

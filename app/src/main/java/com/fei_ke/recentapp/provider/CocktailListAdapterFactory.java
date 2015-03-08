@@ -2,7 +2,6 @@
 package com.fei_ke.recentapp.provider;
 
 import android.app.ActivityManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -11,7 +10,6 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.util.Log;
 import android.util.LruCache;
 import android.view.View;
@@ -25,7 +23,7 @@ import java.util.List;
 public class CocktailListAdapterFactory implements RemoteViewsFactory {
     static final String TAG = "CocktailListAdapter ";
 
-    LruCache<String, Bitmap> iconCache = new LruCache<>(30 * 1024 * 1024);
+    LruCache<String, Bitmap> iconCache = new LruCache<String, Bitmap>(30 * 1024 * 1024);
     private Context mContext;
     private ActivityManager mActivityManager;
     private List<ActivityManager.RecentTaskInfo> mAppList;
@@ -62,22 +60,14 @@ public class CocktailListAdapterFactory implements RemoteViewsFactory {
         ActivityManager.RecentTaskInfo recentTask = mAppList.get(getCount() - position - 1);
         RemoteViews contentView = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
         contentView.setViewVisibility(R.id.imageViewClose, Settings.isSwitchOn() ? View.VISIBLE : View.GONE);
-
         Intent baseIntent = recentTask.baseIntent;
+
+
         String packageName = baseIntent.getComponent().getPackageName();
 
-        Bundle extras = new Bundle();
         Intent fillInIntent = new Intent();
-        if (Settings.isSwitchOn()) {
-            extras.putString(Constants.EXTRA_PACKAGE_NAME, packageName);
-        } else {
-            PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, baseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            if (recentTask.origActivity != null) {
-                baseIntent.setComponent(recentTask.origActivity);
-            }
-            extras.putParcelable(Constants.EXTRA_CONTENT_INTENT, pIntent);
-        }
-        fillInIntent.putExtras(extras);
+        fillInIntent.putExtra(Constants.EXTRA_RECENT_TASK, recentTask);
+
         contentView.setOnClickFillInIntent(R.id.widget_item_layout, fillInIntent);
 
         Bitmap icon = iconCache.get(packageName);
